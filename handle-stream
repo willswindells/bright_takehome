@@ -1,0 +1,163 @@
+#! /usr/bin/env -S uv run --script
+
+# /// script
+# dependencies = [
+#     "dbt-core>=1.9.3",
+#     "dbt-duckdb>=1.9.2",
+#     "duckdb>=1.2.1",
+#     "pandas>=2.2.3",
+# ]
+# ///
+
+import subprocess
+import threading
+import sys
+import json
+import os
+import time
+import duckdb
+
+# def db_connect():
+#     """
+#     Connects to duckdb
+#     """
+#     conn = duckdb.connect("bluesky.db")
+#     print("connected to duckDB")
+
+def db_import_data():
+    """
+    updates via simple replace the seed table for raw bluesky data
+    One run a minuet loop as streaming example
+    """
+    print("attempting connection to duckdb")
+    conn = duckdb.connect("bluesky.db")
+    print("connected to duckDB")
+
+    # first batch buildup
+    time.sleep(5)
+
+    # one min looping
+    while True:
+        print("Starting load")
+        conn.execute("""
+        CREATE OR REPLACE TABLE seed_bluesky_raw AS
+        SELECT *
+        FROM 'bluesky.json';
+        -- FROM read_json_auto('bluesky.json');
+        """)
+        print("loaded_raw_file")
+        time.sleep(6)
+
+def append_json_to_file(json_string, filename="bluesky.json"):
+    """
+    Parses a single-line JSON string and appends it to a file, one JSON object per line.
+
+    Args:
+        json_string (str): The single-line JSON string.
+        filename (str): The name of the file to append to.
+    """
+    try:
+        data = json.loads(json_string) #parse json string to python object.
+        with open(filename, "a") as f: #opens file in append mode.
+            json.dump(data, f)
+            f.write("\n") #add newline character so each json is on a new line.
+        print(f"JSON data appended to {filename}")
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+def db_readout():
+    """
+    Reads JSON data from stdin and saves it to a file.
+    """
+    print("python listening\n")
+    # while True:
+    #     y = 0
+    #     print("python starting time loop\n" + str(y))
+    for line in sys.stdin:
+        # print("\nline " + str(y))
+        print("\nline ")
+        append_json_to_file(line)
+            # if y % 1000 == 0:
+            #     db_import_data()
+            # elif y % 1000 != 0:
+            #     continue   
+            # y += 1
+    #json_string = sys.stdin.read()
+    print("python output\n")
+    #print(json_string)   
+
+# def db_dbt_run():
+#     """
+#     runs dbt build every 50 seconds on duckdb
+#     """
+#     print("attempting dbt build")
+#     # one min looping
+#     while True:
+#         subprocess.call("dbt_build.sh")
+#         print("dbt build done")
+#         time.sleep(50)
+
+def run_and_export_csvs():
+    """
+    runs extracting csvs answers 50 second loop
+    """
+    print("extracting data")
+    conn = duckdb.connect("bluesky.db")
+    # one min looping
+    while True:
+        conn.execute("""COPY engineering_post_analysis TO 'engineering_related_words.csv' (HEADER, DELIMITER ',')""")
+        conn.execute("""COPY likes-per-minutes TO 'likes-per-minutes.csv' (HEADER, DELIMITER ',')""")
+        conn.execute("""COPY fast-likers TO 'fast-likers.csv' (HEADER, DELIMITER ',')""")
+        time.sleep(50)
+
+
+def run_capture_and_import_and_dbt_build():
+    """Runs capture and import alongside eachother"""
+
+    readout = threading.Thread(target=db_readout) 
+    import_data = threading.Thread(target=db_import_data) 
+    # dbt_build = threading.Thread(target=db_dbt_run)
+    # csvs_build = threading.Thread(target=run_and_export_csvs) 
+
+    readout.start()
+    import_data.start()
+    # dbt_build.start()
+    # csvs_build.start()
+    readout.join() 
+    import_data.join() 
+    # dbt_build.join() 
+    # csvs_build.join() 
+    print("Done")
+
+
+def main():
+
+    #New to multithreading
+    run_capture_and_import_and_dbt_build()
+
+
+    # """
+    # Reads JSON data from stdin and saves it to a file.
+    # """
+    # print("python listening\n")
+    # start = time.time()
+    # while time.time() < start + 1:
+    #     y = 0
+    #     print("python starting time loop\n" + str(y))
+    #     while y < 100:
+    #         for line in sys.stdin:
+    #             print(line)
+    #             print("line break")
+    #             print("line in " + str(y))
+    #             append_json_to_file(line)
+    #             y += 1
+    #     print("1000 vs " + str(y))
+    #     #json_string = sys.stdin.read()
+    #     print("python output\n")
+    #     #print(json_string)    
+
+
+if __name__ == "__main__":
+    main()

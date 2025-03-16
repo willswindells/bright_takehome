@@ -1,0 +1,11 @@
+version: 2
+
+
+#could have done this here and seeded json into dbt
+#But split it to allow for cron job triggering outside dbt
+
+# seeds:
+#   - name: stg_bluesky_events
+#     config:
+#       column_types:
+#         revenue: bigint

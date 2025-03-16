@@ -1,0 +1,6 @@
+metrics/
+*.pyc
+.DS_Store
+*.swp
+*.swo
+*.log

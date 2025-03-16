@@ -1,0 +1,18 @@
+version: 2
+
+# sources:
+#   - name: duckdb
+#     database: bluesky
+#     schema: main  
+#     tables:
+#       - name: seed_bluesky_raw
+
+models:
+  - name: stg_bluesky_events
+    columns:
+      - name: cid
+        tests:
+          - not_null
+          - unique
+
+    +materialized: table
