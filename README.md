@@ -4,15 +4,28 @@
 
 Created handle-stream to save bluesky output of data to csv
 UV python script
-running `./bluesky | ./handle-stream` will build csv file waiting for intrupt as requested
+running `./bluesky | ./handle-stream` will:
+Build csv file of Json from stdout
+Preiodically import to duckdb and (re)build dbt models,
+Including analysis questions as marts - Which are then exported post build
+And will wait for intrupt
 
 
-next database connection with duckdb_connect.py 
-to injest it into a duckdb and thus dbt. 
+I first built multistep process with distinct start stop steps
+Building json, importing, dbt modeling, exporting all happening in order one at a time
 
-dbt build to build and test models 
+However Rebuilt for realtime streaming as per the question.
+Fustrating duckdb lock/connection issues with this
+I am willing to admit complete lack of familiarity with concurent/streaming processes
+Has been interesting to attempt it, but I am awear it is not high quality
 
-UV to manage packages and duckdb
+
+### The tech used
+UV to manage packages as per bluesky code
+Duckdb as the database with dbt ontop
+Three CSVs (not sure about an orignal analysis now) built as marts for ease'
+And exported using duckdb
+
 uv run duckdb bluesky.db to init database from CLI
 
 To start UI for data explore
@@ -20,17 +33,9 @@ duckdb$
 CALL start_ui();
 http://localhost:4213/
 
-
 Duckdb install
 curl https://install.duckdb.org | sh
 
-
-Output CSVs 
-
-Up to the minuet CSVs from an dbt enviroment is not really the best usecase
-
-Streaming in near realtime is not something i am familiar with. 
-I have lock/ db connection issues now i have made the code multithreaded. 
 
 -----------
 
