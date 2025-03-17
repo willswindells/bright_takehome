@@ -17,18 +17,13 @@ import os
 import time
 import duckdb
 
-# def db_connect():
-#     """
-#     Connects to duckdb
-#     """
-#     conn = duckdb.connect("bluesky.db")
-#     print("connected to duckDB")
 
 def db_import_data():
     """
     updates via simple replace the seed table for raw bluesky data
     One run a minuet loop as streaming example
     """
+
     print("attempting connection to duckdb")
     conn = duckdb.connect("bluesky.db")
     print("connected to duckDB")
@@ -56,11 +51,12 @@ def append_json_to_file(json_string, filename="bluesky.json"):
         json_string (str): The single-line JSON string.
         filename (str): The name of the file to append to.
     """
+
     try:
-        data = json.loads(json_string) #parse json string to python object.
-        with open(filename, "a") as f: #opens file in append mode.
+        data = json.loads(json_string)
+        with open(filename, "a") as f: 
             json.dump(data, f)
-            f.write("\n") #add newline character so each json is on a new line.
+            f.write("\n") 
         print(f"JSON data appended to {filename}")
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
@@ -71,22 +67,14 @@ def db_readout():
     """
     Reads JSON data from stdin and saves it to a file.
     """
+
     print("python listening\n")
-    # while True:
-    #     y = 0
-    #     print("python starting time loop\n" + str(y))
     for line in sys.stdin:
-        # print("\nline " + str(y))
         print("\nline ")
         append_json_to_file(line)
-            # if y % 1000 == 0:
-            #     db_import_data()
-            # elif y % 1000 != 0:
-            #     continue   
-            # y += 1
-    #json_string = sys.stdin.read()
+
     print("python output\n")
-    #print(json_string)   
+ 
 
 # def db_dbt_run():
 #     """

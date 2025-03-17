@@ -13,13 +13,11 @@ to injest it into a duckdb and thus dbt.
 dbt build to build and test models 
 
 UV to manage packages and duckdb
-
-uv run duckdb_connect.py 
-uv run duckdb bluesky.db
-
+uv run duckdb bluesky.db to init database from CLI
 
 To start UI for data explore
-duckdb$  CALL start_ui();
+duckdb$  
+CALL start_ui();
 http://localhost:4213/
 
 
@@ -29,10 +27,12 @@ curl https://install.duckdb.org | sh
 
 Output CSVs 
 
-Up to the minuet CSVs from dbt models are not really the best usecase
+Up to the minuet CSVs from an dbt enviroment is not really the best usecase
 
+Streaming in near realtime is not something i am familiar with. 
+I have lock/ db connection issues now i have made the code multithreaded. 
 
-
+-----------
 
 Objective: Construct a local data pipeline consuming [Bluesky](https://bsky.app/) event streams.
 

@@ -8,9 +8,7 @@ bluesky_source as (
 
     select 
     *
-    -- from {{ source('bluesky','seed_bluesky_raw') }}
-    from 
-        (select 1 as test)
+    from {{ source('bluesky','seed_bluesky_raw') }}
 
 ),
 
