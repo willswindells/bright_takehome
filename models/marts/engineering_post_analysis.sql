@@ -1,5 +1,11 @@
---Put here to build and export with dbt build
+{{
+    config(
+        materialized='incremental',
 
+    )
+}}
+
+      --Put here to build and export with dbt build
 with base as (
 select
 string_split(record_created_at_1,' ')   as splits,
@@ -20,3 +26,4 @@ from base
  cross join unnest(splits)   splits_full(splits)
 group by 1
 order by 2 desc
+limit 10

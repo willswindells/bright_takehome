@@ -1,5 +1,10 @@
---Put here to build and export with dbt build
+{{
+    config(
+        materialized='incremental',
 
+    )
+}}
+--Put here to build and export with dbt build
 select
     concat(cast(strftime('%Y-%m-%d %H:%M', created_at) as string),':00') AS time,
     sum(is_feed_like) as likes

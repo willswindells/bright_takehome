@@ -1,3 +1,13 @@
+{{
+    config(
+        materialized='incremental',
+        cluster_by = 'full_path',
+        tags=["events"],
+        unique_key='cid',
+    )
+}}
+
+
 --
 -- Bluesky nested Json process
 --
