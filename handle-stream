@@ -31,7 +31,7 @@ def db_import_data():
     # first batch buildup
     time.sleep(5)
 
-    # one min looping
+    # time loop delay
     while True:
         print("Starting load")
         conn.execute("""
@@ -76,16 +76,16 @@ def db_readout():
     print("python output\n")
  
 
-# def db_dbt_run():
-#     """
-#     runs dbt build every 50 seconds on duckdb
-#     """
-#     print("attempting dbt build")
-#     # one min looping
-#     while True:
-#         subprocess.call("dbt_build.sh")
-#         print("dbt build done")
-#         time.sleep(50)
+def db_dbt_run():
+    """
+    runs dbt build every 50 seconds on duckdb
+    """
+    print("attempting dbt build")
+    # time loop delay
+    while True:
+        subprocess.call("dbt_build.sh")
+        print("dbt build done")
+        time.sleep(50)
 
 def run_and_export_csvs():
     """
@@ -93,7 +93,7 @@ def run_and_export_csvs():
     """
     print("extracting data")
     conn = duckdb.connect("bluesky.db")
-    # one min looping
+    # time loop delay
     while True:
         conn.execute("""COPY engineering_post_analysis TO 'engineering_related_words.csv' (HEADER, DELIMITER ',')""")
         conn.execute("""COPY likes-per-minutes TO 'likes-per-minutes.csv' (HEADER, DELIMITER ',')""")
@@ -106,17 +106,19 @@ def run_capture_and_import_and_dbt_build():
 
     readout = threading.Thread(target=db_readout) 
     import_data = threading.Thread(target=db_import_data) 
-    # dbt_build = threading.Thread(target=db_dbt_run)
-    # csvs_build = threading.Thread(target=run_and_export_csvs) 
+    dbt_build = threading.Thread(target=db_dbt_run)
+    csvs_build = threading.Thread(target=run_and_export_csvs) 
 
     readout.start()
     import_data.start()
-    # dbt_build.start()
-    # csvs_build.start()
+    dbt_build.start()
+    csvs_build.start()
+
     readout.join() 
     import_data.join() 
-    # dbt_build.join() 
-    # csvs_build.join() 
+    dbt_build.join() 
+    csvs_build.join() 
+
     print("Done")
 
 
@@ -124,27 +126,6 @@ def main():
 
     #New to multithreading
     run_capture_and_import_and_dbt_build()
-
-
-    # """
-    # Reads JSON data from stdin and saves it to a file.
-    # """
-    # print("python listening\n")
-    # start = time.time()
-    # while time.time() < start + 1:
-    #     y = 0
-    #     print("python starting time loop\n" + str(y))
-    #     while y < 100:
-    #         for line in sys.stdin:
-    #             print(line)
-    #             print("line break")
-    #             print("line in " + str(y))
-    #             append_json_to_file(line)
-    #             y += 1
-    #     print("1000 vs " + str(y))
-    #     #json_string = sys.stdin.read()
-    #     print("python output\n")
-    #     #print(json_string)    
 
 
 if __name__ == "__main__":
