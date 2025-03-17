@@ -5,9 +5,13 @@
 Created handle-stream to save bluesky output of data to csv
 UV python script
 running `./bluesky | ./handle-stream` will:
+
 Build csv file of Json from stdout
-Preiodically import to duckdb and (re)build dbt models,
+
+Preiodically import to duckdb and (re)build dbt models
+
 Including analysis questions as marts - Which are then exported post build
+
 And will wait for intrupt
 
 
